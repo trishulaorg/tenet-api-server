@@ -1,0 +1,24 @@
+name: Setup sccache
+description: setup sccache
+inputs:
+  sccache-version:
+    description: sccache version
+    required: false
+    default: 0.2.15
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+    - name: Install sccache
+      uses: ./.github/actions/install-sccache
+
+    - name: Install Rust toolchain
+      uses: ./.github/actions/install-toolchain
+
+    - name: Prepare sccache
+      uses: ./.github/actions/prepare-sccache
+
+    - name: Start sccache server
+      shell: bash
+      run: sccache --start-server

@@ -1,0 +1,16 @@
+name: Prepare sccache
+description: prepare sccache
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare sccache
+      uses: actions/cache@v3
+      continue-on-error: false
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: ${{ runner.os }}-sccache-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-sccache-

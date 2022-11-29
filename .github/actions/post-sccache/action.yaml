@@ -1,0 +1,12 @@
+name: Post sccache
+description: post sccache
+
+runs:
+  using: composite
+  steps:
+    - name: Print sccache stats
+      shell: bash
+      run: sccache --show-stats
+    - name: Stop sccache server
+      shell: bash
+      run: sccache --stop-server || true
