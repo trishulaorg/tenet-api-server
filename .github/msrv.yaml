@@ -1,0 +1,42 @@
+name: Check msrv
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_RETRY: 10
+  RUSTUP_MAX_RETRIES: 10
+  RUST_BACKTRACE: short
+
+jobs:
+  check-msrv:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - nightly
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+
+      - name: Run cargo check
+        uses: actions-rs/cargo@v1
+        with:
+          command: update
+          args: -Z minimal-versions
+
+      - name: Cargo check
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
