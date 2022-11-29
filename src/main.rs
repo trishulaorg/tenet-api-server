@@ -1,7 +1,8 @@
-use async_graphql::{http::GraphiQLSource, Context, Object, EmptyMutation, EmptySubscription, Schema};
+use async_graphql::{
+    http::GraphiQLSource, Context, EmptyMutation, EmptySubscription, Object, Schema,
+};
 use async_graphql_poem::GraphQL;
 use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
-
 
 pub struct QueryRoot;
 
@@ -9,8 +10,8 @@ pub struct QueryRoot;
 impl QueryRoot {
     async fn howdy<'a>(
         &self,
-        ctx: &Context<'a>,
-        #[graphql(desc = "id of the human")] id: String
+        _ctx: &Context<'a>,
+        #[graphql(desc = "id of the human")] _id: String,
     ) -> &'static str {
         "partner"
     }
