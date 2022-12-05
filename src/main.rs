@@ -4,6 +4,7 @@ use async_graphql::{
 use async_graphql_poem::GraphQL;
 use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
 
+mod model;
 pub struct QueryRoot;
 
 #[Object]
