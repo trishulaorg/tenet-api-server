@@ -51,6 +51,10 @@ impl QueryRoot {
         let db = ctx.data::<DatabaseConnection>().unwrap();
         Persona::find().all(db).await
     }
+    async fn activities(&self, ctx: &Context<'_>) -> Result<Vec<post::Model>, DbErr> {
+        let db = ctx.data::<DatabaseConnection>().unwrap();
+        Post::find().all(db).await
+    }
 }
 
 
