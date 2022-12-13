@@ -11,17 +11,18 @@ use async_graphql::{
 use async_graphql_poem::GraphQL;
 use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
 
-mod model;
+mod models;
 pub struct QueryRoot;
 
 #[Object]
 impl QueryRoot {
     async fn howdy<'a>(
         &self,
-        _ctx: &Context<'a>,
+        ctx: &Context<'a>,
         #[graphql(desc = "id of the human")] _id: String,
     ) -> &str {
-        "howdy"
+        "aaa"
+    
     }
 }
 
@@ -36,21 +37,19 @@ async fn graphql() -> impl IntoResponse {
 
 async fn database() -> DatabaseConnection {
     let db_url = env::var("DATABASE_URL").unwrap();
-    Database::connect(db_url).await.unwrap()
+    Database::connect(db_url).await?
 }
 
 #[tokio::main]
 async fn main() {
+    dotenv().ok();
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::DEBUG)
         .with_test_writer()
         .init();
+
     // create the schema
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription).finish();
-    dotenv().ok();
-    
-    let db = database();
-
 
     // start the http server
     let app = Route::new().at("/", get(graphql).post(GraphQL::new(schema)));
