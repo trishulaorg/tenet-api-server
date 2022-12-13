@@ -1,5 +1,12 @@
+
+use dotenv::dotenv;
+use sea_orm::{DatabaseConnection, Database};
+use std::env;
+
+
+use tracing_subscriber;
 use async_graphql::{
-    http::GraphiQLSource, Context, EmptyMutation, EmptySubscription, Object, Schema,
+    http::GraphiQLSource, Context, EmptyMutation, EmptySubscription, Object, Schema, parser::Error,
 };
 use async_graphql_poem::GraphQL;
 use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
@@ -12,8 +19,8 @@ impl QueryRoot {
         &self,
         _ctx: &Context<'a>,
         #[graphql(desc = "id of the human")] _id: String,
-    ) -> &'static str {
-        "partner"
+    ) -> &str {
+        "howdy"
     }
 }
 
@@ -26,10 +33,23 @@ async fn graphql() -> impl IntoResponse {
     )
 }
 
+async fn database() -> DatabaseConnection {
+    let db_url = env::var("DATABASE_URL").unwrap();
+    Database::connect(db_url).await.unwrap()
+}
+
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::DEBUG)
+        .with_test_writer()
+        .init();
     // create the schema
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription).finish();
+    dotenv().ok();
+    
+    let db = database();
+
 
     // start the http server
     let app = Route::new().at("/", get(graphql).post(GraphQL::new(schema)));
