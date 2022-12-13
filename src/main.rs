@@ -30,8 +30,8 @@ impl QueryRoot {
         &self,
         ctx: &Context<'a>,
         #[graphql(desc = "id of the human")] _id: String,
-    ) -> &str {
-        "aaa"
+    ) -> String {
+        "aaa".to_owned()
     
     }
 
@@ -39,15 +39,21 @@ impl QueryRoot {
         let db = ctx.data::<DatabaseConnection>().unwrap();
         User::find_by_id(id).one(db).await
     }
-}
-
-#[ComplexObject]
-impl user::Model {
-    async fn personas(&self, ctx: &Context<'_>) -> Result<Vec<persona::Model>, DbErr> {
+    async fn users(&self, ctx: &Context<'_>, id: i32) -> Result<Vec<user::Model>, DbErr> {
         let db = ctx.data::<DatabaseConnection>().unwrap();
-        self.find_related(Persona).all(db).await
+        User::find().all(db).await
+    }
+    async fn persona(&self, ctx: &Context<'_>, id: i32) -> Result<Option<persona::Model>, DbErr> {
+        let db = ctx.data::<DatabaseConnection>().unwrap();
+        Persona::find_by_id(id).one(db).await
+    }
+    async fn personas(&self, ctx: &Context<'_>, id: i32) -> Result<Vec<persona::Model>, DbErr> {
+        let db = ctx.data::<DatabaseConnection>().unwrap();
+        Persona::find().all(db).await
     }
 }
+
+
 
 #[handler]
 async fn graphql() -> impl IntoResponse {
