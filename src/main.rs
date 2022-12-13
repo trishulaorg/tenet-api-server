@@ -13,7 +13,7 @@ use crate::entities::{prelude::*, *};
 
 use tracing_subscriber;
 use async_graphql::{
-    http::GraphiQLSource, Context, EmptyMutation, EmptySubscription, Object, Schema, parser::Error,
+    http::GraphiQLSource, Context, EmptyMutation, EmptySubscription, Object, Schema, parser::Error, ComplexObject,
 };
 use async_graphql_poem::GraphQL;
 use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
@@ -38,6 +38,14 @@ impl QueryRoot {
     async fn user(&self, ctx: &Context<'_>, id: i32) -> Result<Option<user::Model>, DbErr> {
         let db = ctx.data::<DatabaseConnection>().unwrap();
         User::find_by_id(id).one(db).await
+    }
+}
+
+#[ComplexObject]
+impl user::Model {
+    async fn personas(&self, ctx: &Context<'_>) -> Result<Vec<persona::Model>, DbErr> {
+        let db = ctx.data::<DatabaseConnection>().unwrap();
+        self.find_related(Persona).all(db).await
     }
 }
 
