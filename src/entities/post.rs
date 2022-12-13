@@ -2,7 +2,7 @@
 use crate::graphql;
 
 use super::{sea_orm_active_enums::ContentType, thread};
-use async_graphql::{SimpleObject, Context, ComplexObject};
+use async_graphql::{ComplexObject, Context, SimpleObject};
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, SimpleObject)]

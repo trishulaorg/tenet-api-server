@@ -2,7 +2,7 @@
 use crate::graphql;
 
 use super::sea_orm_active_enums::ContentType;
-use async_graphql::{Context, ComplexObject, SimpleObject};
+use async_graphql::{ComplexObject, Context, SimpleObject};
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, SimpleObject)]
@@ -33,7 +33,7 @@ pub enum Relation {
         from = "Column::PostId",
         to = "super::post::Column::Id"
     )]
-    Post
+    Post,
 }
 
 impl Related<super::post::Entity> for Entity {

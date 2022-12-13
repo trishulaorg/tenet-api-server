@@ -2,7 +2,7 @@ mod setup;
 
 use futures::executor::block_on;
 
-use sea_orm::{Database, DbErr, DatabaseConnection, ConnectionTrait};
+use sea_orm::{ConnectionTrait, Database, DatabaseConnection, DbErr};
 
 use std::env;
 
@@ -10,17 +10,17 @@ use setup::set_up_db;
 
 use crate::entities::{prelude::*, *};
 
-
-use tracing_subscriber;
 use async_graphql::{
-    http::GraphiQLSource, Context, EmptyMutation, EmptySubscription, Object, Schema, parser::Error, ComplexObject,
+    http::GraphiQLSource, parser::Error, ComplexObject, Context, EmptyMutation, EmptySubscription,
+    Object, Schema,
 };
 use async_graphql_poem::GraphQL;
 use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
+use tracing_subscriber;
 
 mod entities;
-use sea_orm::*;
 use entities::*;
+use sea_orm::*;
 
 pub struct QueryRoot;
 
@@ -32,7 +32,6 @@ impl QueryRoot {
         #[graphql(desc = "id of the human")] _id: String,
     ) -> String {
         "aaa".to_owned()
-    
     }
 
     async fn user(&self, ctx: &Context<'_>, id: i32) -> Result<Option<user::Model>, DbErr> {
@@ -73,8 +72,6 @@ impl QueryRoot {
     }
 }
 
-
-
 #[handler]
 async fn graphql() -> impl IntoResponse {
     Html(
@@ -83,7 +80,6 @@ async fn graphql() -> impl IntoResponse {
             .finish(),
     )
 }
-
 
 #[tokio::main]
 async fn main() {
@@ -98,7 +94,9 @@ async fn main() {
         Err(err) => panic!("{}", err),
     };
     // create the schema
-    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription).data(db).finish();
+    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
+        .data(db)
+        .finish();
 
     // start the http server
     let app = Route::new().at("/", get(graphql).post(GraphQL::new(schema)));
