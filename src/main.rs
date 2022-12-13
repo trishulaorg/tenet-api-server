@@ -55,6 +55,22 @@ impl QueryRoot {
         let db = ctx.data::<DatabaseConnection>().unwrap();
         Post::find().all(db).await
     }
+    async fn post(&self, ctx: &Context<'_>, id: String) -> Result<Option<post::Model>, DbErr> {
+        let db = ctx.data::<DatabaseConnection>().unwrap();
+        Post::find_by_id(id).one(db).await
+    }
+    async fn thread(&self, ctx: &Context<'_>, id: String) -> Result<Option<thread::Model>, DbErr> {
+        let db = ctx.data::<DatabaseConnection>().unwrap();
+        Thread::find_by_id(id).one(db).await
+    }
+    async fn posts(&self, ctx: &Context<'_>) -> Result<Vec<post::Model>, DbErr> {
+        let db = ctx.data::<DatabaseConnection>().unwrap();
+        Post::find().all(db).await
+    }
+    async fn threads(&self, ctx: &Context<'_>) -> Result<Vec<thread::Model>, DbErr> {
+        let db = ctx.data::<DatabaseConnection>().unwrap();
+        Thread::find().all(db).await
+    }
 }
 
 
