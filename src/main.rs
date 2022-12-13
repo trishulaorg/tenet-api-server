@@ -1,6 +1,8 @@
+use futures::executor::block_on;
 
 use dotenv::dotenv;
-use sea_orm::{DatabaseConnection, Database};
+use sea_orm::{Database, DbErr};
+
 use std::env;
 
 
@@ -11,7 +13,6 @@ use async_graphql::{
 use async_graphql_poem::GraphQL;
 use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
 
-mod models;
 pub struct QueryRoot;
 
 #[Object]
@@ -26,6 +27,13 @@ impl QueryRoot {
     }
 }
 
+async fn run() -> Result<(), DbErr> {
+    let DATABASE_URL = env::var("DATABASE_URL").unwrap();
+    let db = Database::connect(DATABASE_URL).await?;
+
+    Ok(())
+}
+
 #[handler]
 async fn graphql() -> impl IntoResponse {
     Html(
@@ -35,10 +43,6 @@ async fn graphql() -> impl IntoResponse {
     )
 }
 
-async fn database() -> DatabaseConnection {
-    let db_url = env::var("DATABASE_URL").unwrap();
-    Database::connect(db_url).await?
-}
 
 #[tokio::main]
 async fn main() {
@@ -54,6 +58,9 @@ async fn main() {
     // start the http server
     let app = Route::new().at("/", get(graphql).post(GraphQL::new(schema)));
 
+    if let Err(err) = block_on(run()) {
+        panic!("{}", err);
+    }
     println!("GraphiQL IDE: http://localhost:8000");
     Server::new(TcpListener::bind("127.0.0.1:8000"))
         .run(app)
