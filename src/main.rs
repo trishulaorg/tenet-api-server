@@ -1,10 +1,12 @@
+mod setup;
+
 use futures::executor::block_on;
 
-use dotenv::dotenv;
-use sea_orm::{Database, DbErr};
+use sea_orm::{Database, DbErr, DatabaseConnection, ConnectionTrait};
 
 use std::env;
 
+use setup::set_up_db;
 
 use tracing_subscriber;
 use async_graphql::{
@@ -27,13 +29,6 @@ impl QueryRoot {
     }
 }
 
-async fn run() -> Result<(), DbErr> {
-    let DATABASE_URL = env::var("DATABASE_URL").unwrap();
-    let db = Database::connect(DATABASE_URL).await?;
-
-    Ok(())
-}
-
 #[handler]
 async fn graphql() -> impl IntoResponse {
     Html(
@@ -46,21 +41,21 @@ async fn graphql() -> impl IntoResponse {
 
 #[tokio::main]
 async fn main() {
-    dotenv().ok();
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::DEBUG)
         .with_test_writer()
         .init();
 
+    // init db
+    let db = match set_up_db().await {
+        Ok(db) => db,
+        Err(err) => panic!("{}", err),
+    };
     // create the schema
-    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription).finish();
+    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription).data(db).finish();
 
     // start the http server
     let app = Route::new().at("/", get(graphql).post(GraphQL::new(schema)));
-
-    if let Err(err) = block_on(run()) {
-        panic!("{}", err);
-    }
     println!("GraphiQL IDE: http://localhost:8000");
     Server::new(TcpListener::bind("127.0.0.1:8000"))
         .run(app)
