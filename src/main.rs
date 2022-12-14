@@ -1,22 +1,16 @@
 mod setup;
 
-
-
 use sea_orm::{DatabaseConnection, DbErr};
-
-
 
 use setup::set_up_db;
 
 use crate::entities::{prelude::*, *};
 
 use async_graphql::{
-    http::GraphiQLSource, Context, EmptyMutation, EmptySubscription,
-    Object, Schema,
+    http::GraphiQLSource, Context, EmptyMutation, EmptySubscription, Object, Schema,
 };
 use async_graphql_poem::GraphQL;
 use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
-
 
 mod entities;
 
