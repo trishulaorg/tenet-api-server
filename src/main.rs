@@ -1,25 +1,25 @@
 mod setup;
 
-use futures::executor::block_on;
 
-use sea_orm::{ConnectionTrait, Database, DatabaseConnection, DbErr};
 
-use std::env;
+use sea_orm::{DatabaseConnection, DbErr};
+
+
 
 use setup::set_up_db;
 
 use crate::entities::{prelude::*, *};
 
 use async_graphql::{
-    http::GraphiQLSource, parser::Error, ComplexObject, Context, EmptyMutation, EmptySubscription,
+    http::GraphiQLSource, Context, EmptyMutation, EmptySubscription,
     Object, Schema,
 };
 use async_graphql_poem::GraphQL;
 use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
-use tracing_subscriber;
+
 
 mod entities;
-use entities::*;
+
 use sea_orm::*;
 
 pub struct QueryRoot;
@@ -28,7 +28,7 @@ pub struct QueryRoot;
 impl QueryRoot {
     async fn howdy<'a>(
         &self,
-        ctx: &Context<'a>,
+        _ctx: &Context<'a>,
         #[graphql(desc = "id of the human")] _id: String,
     ) -> String {
         "aaa".to_owned()
@@ -38,7 +38,7 @@ impl QueryRoot {
         let db = ctx.data::<DatabaseConnection>().unwrap();
         User::find_by_id(id).one(db).await
     }
-    async fn users(&self, ctx: &Context<'_>, id: i32) -> Result<Vec<user::Model>, DbErr> {
+    async fn users(&self, ctx: &Context<'_>, _id: i32) -> Result<Vec<user::Model>, DbErr> {
         let db = ctx.data::<DatabaseConnection>().unwrap();
         User::find().all(db).await
     }
@@ -46,7 +46,7 @@ impl QueryRoot {
         let db = ctx.data::<DatabaseConnection>().unwrap();
         Persona::find_by_id(id).one(db).await
     }
-    async fn personas(&self, ctx: &Context<'_>, id: i32) -> Result<Vec<persona::Model>, DbErr> {
+    async fn personas(&self, ctx: &Context<'_>, _id: i32) -> Result<Vec<persona::Model>, DbErr> {
         let db = ctx.data::<DatabaseConnection>().unwrap();
         Persona::find().all(db).await
     }
