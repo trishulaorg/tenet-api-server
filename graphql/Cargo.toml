@@ -8,4 +8,8 @@ edition = "2021"
 [dependencies]
 async-graphql = { version = "4.0.16", features = ["chrono", "time"] }
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
+sea-orm = { version = "0.10.5", features = [ "sqlx-mysql", "runtime-async-std-native-tls", "macros" ] }
+chrono = "0.4.23"
+serde = "1.0.150"
 entities = { path = "../entities" }
+repository = { path = "../repository" }
