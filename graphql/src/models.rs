@@ -3,12 +3,14 @@ use chrono::DateTime;
 use chrono::NaiveDateTime;
 use chrono::Utc;
 use entities::*;
+use entities::sea_orm_active_enums::ContentType;
 use sea_orm::DatabaseConnection;
 use sea_orm::DbErr;
 use sea_orm::EntityTrait;
 use sea_orm::ModelTrait;
 use sea_orm::QueryFilter;
 use sea_orm::ColumnTrait;
+use std::string::String;
 
 #[derive(Clone, Debug, PartialEq, Eq, SimpleObject)]
 #[graphql(complex)] 
@@ -56,6 +58,35 @@ impl From<entities::persona::Model> for Persona {
       screen_name: model.screen_name,
       icon_url: model.icon_url,
       user_id: model.user_id,
+    }
+  }
+}
+
+
+
+#[derive(Clone, Debug, SimpleObject)]
+pub struct Post {
+    pub id: String,
+    pub created_at: NaiveDateTime,
+    pub deleted_at: Option<NaiveDateTime>,
+    pub title: String,
+    pub content_type: String,
+    pub content: String,
+    pub board_id: String,
+    pub persona_id: i32,
+}
+
+impl From<entities::post::Model> for Post {
+  fn from(model: entities::post::Model) -> Self {
+    Self {
+      id: model.id,
+      created_at: model.created_at,
+      deleted_at: model.deleted_at,
+      title: model.title,
+      content_type: model.content_type.to_string(),
+      content: model.content,
+      board_id: model.board_id,
+      persona_id: model.persona_id,
     }
   }
 }
