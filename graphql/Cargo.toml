@@ -14,3 +14,4 @@ serde = { version = "1.0.150", features = ["derive"] }
 entities = { path = "../entities" }
 repository = { path = "../repository" }
 jsonwebtoken = "8"
+anyhow = "1.0"
