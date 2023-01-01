@@ -61,6 +61,6 @@ mod tests {
     async fn it_fails_on_invalid_url() {
         let database_url = "test";
         let database_name = "test";
-        db_connection(&database_url, &database_name).await;
+        db_connection(database_url, database_name).await;
     }
 }

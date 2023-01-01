@@ -1,7 +1,7 @@
 use ::graphql::{queries::*, Token};
 
 use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema};
-use async_graphql_poem::{GraphQL, GraphQLRequest, GraphQLResponse};
+use async_graphql_poem::{GraphQLRequest, GraphQLResponse};
 use poem::{
     get, handler,
     http::HeaderMap,
@@ -10,7 +10,7 @@ use poem::{
     IntoResponse, Route, Server,
 };
 
-use dotenv;
+
 use std::env;
 use tenet_api_server::db_connection;
 
@@ -53,7 +53,7 @@ async fn main() {
     let database_url: std::string::String = env::var("DATABASE_URL").unwrap();
     let database_name: std::string::String = env::var("DATABASE_NAME").unwrap();
     // create the schema
-    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
+    let _schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
         .data(db_connection(&database_url, &database_name).await)
         .finish();
 
