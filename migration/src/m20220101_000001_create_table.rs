@@ -24,7 +24,9 @@ impl MigrationTrait for Migration {
                     .table(Persona::Table)
                     .if_not_exists()
                     .col(ColumnDef::new(Persona::Id).string().not_null().primary_key())
-                    .col(ColumnDef::new(Persona::UserId).date_time().not_null())
+                    .col(ColumnDef::new(Persona::UserId).string().not_null())
+                    .col(ColumnDef::new(Persona::Name).string().not_null())
+                    .col(ColumnDef::new(Persona::ScreenName).string().not_null())
                     .col(ColumnDef::new(Persona::CreatedAt).date_time().not_null())
                     .col(ColumnDef::new(Persona::IconUrl).text().not_null())
                     .col(ColumnDef::new(Persona::Biography).text().not_null())
@@ -38,7 +40,9 @@ impl MigrationTrait for Migration {
                     .table(Bot::Table)
                     .if_not_exists()
                     .col(ColumnDef::new(Bot::Id).string().not_null().primary_key())
-                    .col(ColumnDef::new(Bot::UserId).date_time().not_null())
+                    .col(ColumnDef::new(Bot::UserId).string().not_null())
+                    .col(ColumnDef::new(Bot::Name).string().not_null())
+                    .col(ColumnDef::new(Bot::ScreenName).string().not_null())
                     .col(ColumnDef::new(Bot::CreatedAt).date_time().not_null())
                     .col(ColumnDef::new(Bot::IconUrl).text().not_null())
                     .col(ColumnDef::new(Bot::Biography).text().not_null())
@@ -180,6 +184,8 @@ enum User {
 enum Bot {
     Table,
     Id,
+    Name,
+    ScreenName,
     UserId,
     IconUrl,
     Biography,
@@ -189,6 +195,8 @@ enum Bot {
 enum Persona {
     Table,
     IconUrl,
+    Name,
+    ScreenName,
     Id,
     UserId,
     Biography,
