@@ -9,6 +9,8 @@ pub struct Model {
     pub id: String,
     pub created_at: DateTime,
     #[sea_orm(column_type = "Text")]
+    pub title: String,
+    #[sea_orm(column_type = "Text")]
     pub content: String,
     #[sea_orm(column_type = "Text")]
     pub raw_content: String,

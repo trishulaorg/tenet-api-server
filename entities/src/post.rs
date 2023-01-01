@@ -8,8 +8,10 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
     pub board_id: String,
-    pub user_id: String,
+    pub persona_id: String,
     pub created_at: DateTime,
+    #[sea_orm(column_type = "Text")]
+    pub title: String,
     #[sea_orm(column_type = "Text")]
     pub content: String,
     #[sea_orm(column_type = "Text")]

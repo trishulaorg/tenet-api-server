@@ -3,8 +3,6 @@ use async_graphql::*;
 use chrono::DateTime;
 use chrono::NaiveDateTime;
 use chrono::Utc;
-use entities::sea_orm_active_enums::ContentType;
-use entities::*;
 use sea_orm::ColumnTrait;
 use sea_orm::DatabaseConnection;
 use sea_orm::DbErr;
@@ -18,7 +16,7 @@ use std::string::String;
 #[graphql(complex)]
 pub struct User {
     pub id: String,
-    pub created_at: DateTime<Utc>,
+    pub created_at: NaiveDateTime,
 }
 
 #[ComplexObject]
@@ -45,7 +43,7 @@ impl From<entities::user::Model> for User {
 #[derive(Clone, Debug, SimpleObject)]
 pub struct Persona {
     pub id: String,
-    pub created_at: DateTime<Utc>,
+    pub created_at: NaiveDateTime,
     pub name: String,
     pub screen_name: String,
     pub icon_url: String,
@@ -71,9 +69,7 @@ impl From<entities::persona::Model> for Persona {
 pub struct Post {
     pub id: String,
     pub created_at: NaiveDateTime,
-    pub deleted_at: Option<NaiveDateTime>,
     pub title: String,
-    pub content_type: String,
     pub content: String,
     pub board_id: String,
     pub persona_id: String,
@@ -84,9 +80,7 @@ impl From<entities::post::Model> for Post {
         Self {
             id: model.id,
             created_at: model.created_at,
-            deleted_at: model.deleted_at,
             title: model.title,
-            content_type: model.content_type.to_string(),
             content: model.content,
             board_id: model.board_id,
             persona_id: model.persona_id,
@@ -111,10 +105,7 @@ impl Post {
 pub struct Thread {
     pub id: String,
     pub created_at: NaiveDateTime,
-    pub deleted_at: Option<NaiveDateTime>,
     pub content: String,
-    pub content_type: String,
-    pub board_id: String,
     pub post_id: String,
     pub persona_id: String,
 }
@@ -124,10 +115,7 @@ impl From<entities::thread::Model> for Thread {
         Self {
             id: model.id,
             created_at: model.created_at,
-            deleted_at: model.deleted_at,
             content: model.content,
-            content_type: model.content_type.to_string(),
-            board_id: model.board_id,
             post_id: model.post_id,
             persona_id: model.persona_id,
         }
@@ -153,7 +141,6 @@ pub struct Reply {
     pub content_type: String,
     pub content: String,
     pub created_at: NaiveDateTime,
-    pub deleted_at: Option<NaiveDateTime>,
     pub thread_id: String,
     pub persona_id: String,
 }
@@ -162,9 +149,7 @@ impl From<entities::reply::Model> for Reply {
         Self {
             id: model.id,
             created_at: model.created_at,
-            deleted_at: model.deleted_at,
             content: model.content,
-            content_type: model.content_type.to_string(),
             thread_id: model.thread_id,
             persona_id: model.persona_id,
         }

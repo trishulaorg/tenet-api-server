@@ -13,7 +13,7 @@ impl MigrationTrait for Migration {
                     .table(User::Table)
                     .if_not_exists()
                     .col(ColumnDef::new(User::Id).string().not_null().primary_key())
-                    .col(ColumnDef::new(User::CreatedAt).timestamp().not_null())
+                    .col(ColumnDef::new(User::CreatedAt).date_time().not_null())
                     .to_owned(),
             )
             .await?;
@@ -41,6 +41,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(ColumnDef::new(Bot::Id).string().not_null().primary_key())
                     .col(ColumnDef::new(Bot::UserId).string().not_null())
+                    .col(ColumnDef::new(Bot::Token).string().not_null())
                     .col(ColumnDef::new(Bot::Name).string().not_null())
                     .col(ColumnDef::new(Bot::ScreenName).string().not_null())
                     .col(ColumnDef::new(Bot::CreatedAt).date_time().not_null())
@@ -58,6 +59,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Board::Id).string().not_null().primary_key())
                     .col(ColumnDef::new(Board::CreatedAt).date_time().not_null())
                     .col(ColumnDef::new(Board::Content).text().not_null())
+                    .col(ColumnDef::new(Board::Title).text().not_null())
                     .col(ColumnDef::new(Board::RawContent).text().not_null())
                     .to_owned(),
             )
@@ -69,8 +71,9 @@ impl MigrationTrait for Migration {
                     .table(Post::Table)
                     .if_not_exists()
                     .col(ColumnDef::new(Post::Id).string().not_null().primary_key())
+                    .col(ColumnDef::new(Post::Title).text().not_null())
                     .col(ColumnDef::new(Post::BoardId).string().not_null())
-                    .col(ColumnDef::new(Post::UserId).string().not_null())
+                    .col(ColumnDef::new(Post::PersonaId).string().not_null())
                     .col(ColumnDef::new(Post::CreatedAt).date_time().not_null())
                     .col(ColumnDef::new(Post::Content).text().not_null())
                     .col(ColumnDef::new(Post::RawContent).text().not_null())
@@ -83,7 +86,7 @@ impl MigrationTrait for Migration {
                     .table(Thread::Table)
                     .if_not_exists()
                     .col(ColumnDef::new(Thread::Id).string().not_null().primary_key())
-                    .col(ColumnDef::new(Thread::UserId).string().not_null())
+                    .col(ColumnDef::new(Thread::PersonaId).string().not_null())
                     .col(ColumnDef::new(Thread::PostId).string().not_null())
                     .col(ColumnDef::new(Thread::CreatedAt).date_time().not_null())
                     .col(ColumnDef::new(Thread::Content).text().not_null())
@@ -97,7 +100,7 @@ impl MigrationTrait for Migration {
                     .table(Reply::Table)
                     .if_not_exists()
                     .col(ColumnDef::new(Reply::Id).string().not_null().primary_key())
-                    .col(ColumnDef::new(Reply::UserId).string().not_null())
+                    .col(ColumnDef::new(Reply::PersonaId).string().not_null())
                     .col(ColumnDef::new(Reply::ThreadId).string().not_null())
                     .col(ColumnDef::new(Reply::CreatedAt).date_time().not_null())
                     .col(ColumnDef::new(Reply::Content).text().not_null())
@@ -137,6 +140,7 @@ impl MigrationTrait for Migration {
 enum Board {
     Table,
     Id,
+    Title,
     Content,
     RawContent,
     CreatedAt,
@@ -146,7 +150,8 @@ enum Board {
 enum Post {
     Table,
     Id,
-    UserId,
+    Title,
+    PersonaId,
     BoardId,
     Content,
     RawContent,
@@ -157,7 +162,7 @@ enum Post {
 enum Thread {
     Table,
     Id,
-    UserId,
+    PersonaId,
     PostId,
     Content,
     RawContent,
@@ -167,7 +172,7 @@ enum Thread {
 #[derive(Iden)]
 enum Reply {
     Table,
-    UserId,
+    PersonaId,
     ThreadId,
     Id,
     Content,
@@ -184,6 +189,7 @@ enum User {
 enum Bot {
     Table,
     Id,
+    Token,
     Name,
     ScreenName,
     UserId,
