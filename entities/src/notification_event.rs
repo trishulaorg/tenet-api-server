@@ -9,9 +9,9 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
     #[sea_orm(column_name = "senderId")]
-    pub sender_id: i32,
+    pub sender_id: String,
     #[sea_orm(column_name = "receiverId")]
-    pub receiver_id: i32,
+    pub receiver_id: String,
     pub r#type: Type,
     #[sea_orm(column_name = "createdAt")]
     pub created_at: DateTime,

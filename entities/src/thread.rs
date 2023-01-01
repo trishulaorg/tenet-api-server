@@ -20,7 +20,7 @@ pub struct Model {
     #[sea_orm(column_name = "postId")]
     pub post_id: String,
     #[sea_orm(column_name = "personaId")]
-    pub persona_id: i32,
+    pub persona_id: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

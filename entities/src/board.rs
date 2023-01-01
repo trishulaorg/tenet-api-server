@@ -14,14 +14,6 @@ pub struct Model {
     #[sea_orm(column_name = "deletedAt")]
     pub deleted_at: Option<DateTime>,
     pub description: String,
-    #[sea_orm(column_name = "defaultBoardRoleId")]
-    pub default_board_role_id: i32,
-    #[sea_orm(column_name = "defaultPostRoleId")]
-    pub default_post_role_id: i32,
-    #[sea_orm(column_name = "defaultThreadRoleId")]
-    pub default_thread_role_id: i32,
-    #[sea_orm(column_name = "defaultReplyRoleId")]
-    pub default_reply_role_id: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

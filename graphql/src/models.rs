@@ -1,58 +1,11 @@
 /*
 Base
-datasource db {
-  provider             = "mysql"
-  url                  = env("DATABASE_URL")
-  referentialIntegrity = "prisma"
-}
-
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity"]
-}
-
-generator nexusPrisma {
-  provider        = "nexus-prisma"
-  previewFeatures = ["referentialIntegrity"]
-}
-
 enum ContentType {
   TEXT
   LINK
   IMAGE
   VIDEO
   EMOJI
-}
-
-model AllowedWritingRole {
-  id     Int     @id @default(autoincrement())
-  create Boolean @default(false)
-  read   Boolean @default(false)
-  update Boolean @default(false)
-  delete Boolean @default(false)
-
-  Boards_defaultBoardRole  Board[] @relation("Boards_defaultBoardRole")
-  Boards_defaultPostRole   Board[] @relation("Boards_defaultPostRole")
-  Boards_defaultThreadRole Board[] @relation("Boards_defaultThreadRole")
-  Boards_defaultReplyRole  Board[] @relation("Boards_defaultReplyRole")
-
-  Posts_defaultPostRole   Post[] @relation("Posts_defaultPostRole")
-  Posts_defaultThreadRole Post[] @relation("Posts_defaultThreadRole")
-  Posts_defaultReplyRole  Post[] @relation("Posts_defaultReplyRole")
-
-  SystemAdministratorRoles_boardRole  SystemAdministratorRole[] @relation("SystemAdministratorRoles_boardRole")
-  SystemAdministratorRoles_postRole   SystemAdministratorRole[] @relation("SystemAdministratorRoles_postRole")
-  SystemAdministratorRoles_threadRole SystemAdministratorRole[] @relation("SystemAdministratorRoles_threadRole")
-  SystemAdministratorRoles_replyRole  SystemAdministratorRole[] @relation("SystemAdministratorRoles_replyRole")
-
-  BoardRoles_boardRole  BoardRole[] @relation("BoardRoles_boardRole")
-  BoardRoles_postRole   BoardRole[] @relation("BoardRoles_postRole")
-  BoardRoles_threadRole BoardRole[] @relation("BoardRoles_threadRole")
-  BoardRoles_replyRole  BoardRole[] @relation("BoardRoles_replyRole")
-
-  PostRoles_postRole   PostRole[] @relation("PostRoles_postRole")
-  PostRoles_threadRole PostRole[] @relation("PostRoles_threadRole")
-  PostRoles_replyRole  PostRole[] @relation("PostRoles_replyRole")
 }
 
 model User {
@@ -211,52 +164,6 @@ model UploadedImage {
   parentId String @db.Char(26)
   fileUrl  String @db.Text
 }
-
-model SystemAdministratorRole {
-  id           String             @id @db.Char(26)
-  personas     Persona[]
-  allowAll     Boolean            @default(false)
-  roleManager  Boolean            @default(false)
-  boardRoleId  Int
-  boardRole    AllowedWritingRole @relation("SystemAdministratorRoles_boardRole", fields: [boardRoleId], references: [id])
-  postRoleId   Int
-  postRole     AllowedWritingRole @relation("SystemAdministratorRoles_postRole", fields: [postRoleId], references: [id])
-  threadRoleId Int
-  threadRole   AllowedWritingRole @relation("SystemAdministratorRoles_threadRole", fields: [threadRoleId], references: [id])
-  replyRoleId  Int
-  replyRole    AllowedWritingRole @relation("SystemAdministratorRoles_replyRole", fields: [replyRoleId], references: [id])
-}
-
-model BoardRole {
-  id           String             @id @db.Char(26)
-  personas     Persona[]
-  boards       Board[]
-  allowAll     Boolean            @default(false)
-  roleManager  Boolean            @default(false)
-  boardRoleId  Int
-  boardRole    AllowedWritingRole @relation("BoardRoles_boardRole", fields: [boardRoleId], references: [id])
-  postRoleId   Int
-  postRole     AllowedWritingRole @relation("BoardRoles_postRole", fields: [postRoleId], references: [id])
-  threadRoleId Int
-  threadRole   AllowedWritingRole @relation("BoardRoles_threadRole", fields: [threadRoleId], references: [id])
-  replyRoleId  Int
-  replyRole    AllowedWritingRole @relation("BoardRoles_replyRole", fields: [replyRoleId], references: [id])
-}
-
-model PostRole {
-  id           String             @id @db.Char(26)
-  personas     Persona[]
-  posts        Post[]
-  allowAll     Boolean            @default(false)
-  roleManager  Boolean            @default(false)
-  postRoleId   Int
-  postRole     AllowedWritingRole @relation("PostRoles_postRole", fields: [postRoleId], references: [id])
-  threadRoleId Int
-  threadRole   AllowedWritingRole @relation("PostRoles_threadRole", fields: [threadRoleId], references: [id])
-  replyRoleId  Int
-  replyRole    AllowedWritingRole @relation("PostRoles_replyRole", fields: [replyRoleId], references: [id])
-}
-
 enum ThirdPartyAPIKeyType {
   BOT
   USER
@@ -340,7 +247,7 @@ use std::string::String;
 #[derive(Clone, Debug, PartialEq, Eq, SimpleObject)]
 #[graphql(complex)]
 pub struct User {
-    pub id: i32,
+    pub id: String,
     pub created_at: NaiveDateTime,
     pub token: String,
 }
@@ -369,12 +276,12 @@ impl From<entities::user::Model> for User {
 // Model: Persona
 #[derive(Clone, Debug, SimpleObject)]
 pub struct Persona {
-    pub id: i32,
+    pub id: String,
     pub created_at: NaiveDateTime,
     pub name: String,
     pub screen_name: String,
     pub icon_url: String,
-    pub user_id: i32,
+    pub user_id: String,
 }
 
 impl From<entities::persona::Model> for Persona {
@@ -401,7 +308,7 @@ pub struct Post {
     pub content_type: String,
     pub content: String,
     pub board_id: String,
-    pub persona_id: i32,
+    pub persona_id: String,
 }
 
 impl From<entities::post::Model> for Post {
@@ -441,7 +348,7 @@ pub struct Thread {
     pub content_type: String,
     pub board_id: String,
     pub post_id: String,
-    pub persona_id: i32,
+    pub persona_id: String,
 }
 
 impl From<entities::thread::Model> for Thread {
@@ -480,7 +387,7 @@ pub struct Reply {
     pub created_at: NaiveDateTime,
     pub deleted_at: Option<NaiveDateTime>,
     pub thread_id: String,
-    pub persona_id: i32,
+    pub persona_id: String,
 }
 impl From<entities::reply::Model> for Reply {
     fn from(model: entities::reply::Model) -> Self {
@@ -501,7 +408,7 @@ impl From<entities::reply::Model> for Reply {
 #[graphql(complex)]
 pub struct Bot {
     pub id: String,
-    pub persona_id: i32,
+    pub persona_id: String,
     pub third_party_api_key_id: String,
 }
 
@@ -550,7 +457,7 @@ pub struct ThirdPartyAPIKey {
     pub token: String,
     pub created_at: NaiveDateTime,
     pub revoked_at: Option<NaiveDateTime>,
-    pub user_id: i32,
+    pub user_id: String,
 }
 
 #[ComplexObject]
@@ -587,3 +494,10 @@ impl From<entities::third_party_api_key::Model> for ThirdPartyAPIKey {
         }
     }
 }
+
+// pub struct VoteOnReply {
+//   pub id: String,
+//   pub createdAt: NaiveDateTime,
+//   pub createdById: String,
+//   pub weight: Int
+// }

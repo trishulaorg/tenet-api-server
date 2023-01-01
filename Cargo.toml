@@ -23,6 +23,10 @@ syn = "1.0.106"
 quote = "1.0.22"
 
 graphql = { path = "./graphql" }
+async-std = { version = "^1", features = ["attributes", "tokio1"] }
+
+entities = { path = "./entities" }
+migration = { path = "./migration" }
 
 
 [workspace]
@@ -31,4 +35,5 @@ members = [
   "entities",
   "graphql",
   "repository",
+  "migration",
 ]
