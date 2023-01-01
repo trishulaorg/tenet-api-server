@@ -20,7 +20,11 @@ pub struct Model {
 pub enum Relation {
     #[sea_orm(has_many = "super::reply::Entity")]
     Reply,
-    #[sea_orm(belongs_to = "super::post::Entity", from = "Column::PostId", to = "super::post::Column::Id")]
+    #[sea_orm(
+        belongs_to = "super::post::Entity",
+        from = "Column::PostId",
+        to = "super::post::Column::Id"
+    )]
     Post,
 }
 

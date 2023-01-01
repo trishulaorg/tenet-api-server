@@ -2,11 +2,17 @@ use ::graphql::{queries::*, Token};
 
 use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema};
 use async_graphql_poem::{GraphQL, GraphQLRequest, GraphQLResponse};
-use poem::{get, handler, listener::TcpListener, web::{Html, Data}, IntoResponse, Route, Server, http::HeaderMap};
+use poem::{
+    get, handler,
+    http::HeaderMap,
+    listener::TcpListener,
+    web::{Data, Html},
+    IntoResponse, Route, Server,
+};
 
-use tenet_api_server::db_connection;
 use dotenv;
 use std::env;
+use tenet_api_server::db_connection;
 
 #[handler]
 async fn graphql() -> impl IntoResponse {
@@ -16,7 +22,6 @@ async fn graphql() -> impl IntoResponse {
             .finish(),
     )
 }
-
 
 fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {
     headers

@@ -6,7 +6,6 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-
         manager
             .create_table(
                 Table::create()
@@ -23,7 +22,12 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Persona::Table)
                     .if_not_exists()
-                    .col(ColumnDef::new(Persona::Id).string().not_null().primary_key())
+                    .col(
+                        ColumnDef::new(Persona::Id)
+                            .string()
+                            .not_null()
+                            .primary_key(),
+                    )
                     .col(ColumnDef::new(Persona::UserId).string().not_null())
                     .col(ColumnDef::new(Persona::Name).string().not_null())
                     .col(ColumnDef::new(Persona::ScreenName).string().not_null())
@@ -111,7 +115,6 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-
         manager
             .drop_table(Table::drop().table(User::Table).to_owned())
             .await?;

@@ -22,8 +22,12 @@ pub struct Model {
 pub enum Relation {
     #[sea_orm(has_many = "super::thread::Entity")]
     Thread,
-    #[sea_orm(belongs_to = "super::board::Entity", from = "Column::BoardId", to = "super::board::Column::Id")]
-    Board
+    #[sea_orm(
+        belongs_to = "super::board::Entity",
+        from = "Column::BoardId",
+        to = "super::board::Column::Id"
+    )]
+    Board,
 }
 
 impl Related<super::thread::Entity> for Entity {

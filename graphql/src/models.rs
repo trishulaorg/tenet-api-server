@@ -1,4 +1,3 @@
-
 use async_graphql::*;
 use chrono::DateTime;
 use chrono::NaiveDateTime;
@@ -63,6 +62,31 @@ impl From<entities::persona::Model> for Persona {
     }
 }
 
+// Model: Persona
+#[derive(Clone, Debug, SimpleObject)]
+pub struct Bot {
+    pub id: String,
+    pub created_at: NaiveDateTime,
+    pub token: String,
+    pub name: String,
+    pub screen_name: String,
+    pub icon_url: String,
+    pub user_id: String,
+}
+
+impl From<entities::bot::Model> for Bot {
+    fn from(model: entities::bot::Model) -> Self {
+        Self {
+            id: model.id,
+            created_at: model.created_at,
+            name: model.name,
+            token: model.token,
+            screen_name: model.screen_name,
+            icon_url: model.icon_url,
+            user_id: model.user_id,
+        }
+    }
+}
 // Model: Post
 #[derive(Clone, Debug, SimpleObject)]
 #[graphql(complex)]
@@ -138,7 +162,6 @@ impl Thread {
 #[derive(Clone, Debug, SimpleObject)]
 pub struct Reply {
     pub id: String,
-    pub content_type: String,
     pub content: String,
     pub created_at: NaiveDateTime,
     pub thread_id: String,
@@ -152,98 +175,6 @@ impl From<entities::reply::Model> for Reply {
             content: model.content,
             thread_id: model.thread_id,
             persona_id: model.persona_id,
-        }
-    }
-}
-
-// Model: Bot
-#[derive(Clone, Debug, SimpleObject)]
-#[graphql(complex)]
-pub struct Bot {
-    pub id: String,
-    pub persona_id: String,
-    pub third_party_api_key_id: String,
-}
-
-impl From<entities::bot::Model> for Bot {
-    fn from(model: entities::bot::Model) -> Self {
-        Self {
-            id: model.id,
-            persona_id: model.persona_id,
-            third_party_api_key_id: model.third_party_api_key_id,
-        }
-    }
-}
-
-#[ComplexObject]
-impl Bot {
-    async fn persona(&self, context: &Context<'_>) -> Result<Option<Persona>, DbErr> {
-        let db = context.data::<DatabaseConnection>().unwrap();
-        let persona = entities::persona::Entity::find()
-            .filter(entities::persona::Column::Id.eq(self.persona_id.clone()))
-            .one(db)
-            .await?;
-        Ok(persona.map(Persona::from))
-    }
-
-    async fn third_party_api_key(
-        &self,
-        context: &Context<'_>,
-    ) -> Result<Option<ThirdPartyAPIKey>, DbErr> {
-        let db = context.data::<DatabaseConnection>().unwrap();
-        let third_party_api_key = entities::third_party_api_key::Entity::find()
-            .filter(
-                entities::third_party_api_key::Column::Id.eq(self.third_party_api_key_id.clone()),
-            )
-            .one(db)
-            .await?;
-        Ok(third_party_api_key.map(ThirdPartyAPIKey::from))
-    }
-}
-
-// Model: THirdPartyAPIKey
-#[derive(Clone, Debug, SimpleObject)]
-#[graphql(complex)]
-pub struct ThirdPartyAPIKey {
-    pub id: String,
-    pub r#type: String,
-    pub token: String,
-    pub created_at: NaiveDateTime,
-    pub revoked_at: Option<NaiveDateTime>,
-    pub user_id: String,
-}
-
-#[ComplexObject]
-impl ThirdPartyAPIKey {
-    // user
-    async fn user(&self, context: &Context<'_>) -> Result<Option<User>, DbErr> {
-        let db = context.data::<DatabaseConnection>().unwrap();
-        let user = entities::user::Entity::find()
-            .filter(entities::user::Column::Id.eq(self.user_id.clone()))
-            .one(db)
-            .await?;
-        Ok(user.map(User::from))
-    }
-    // bot
-    async fn bot(&self, context: &Context<'_>) -> Result<Option<Bot>, DbErr> {
-        let db = context.data::<DatabaseConnection>().unwrap();
-        let bot = entities::bot::Entity::find()
-            .filter(entities::bot::Column::ThirdPartyApiKeyId.eq(self.id.clone()))
-            .one(db)
-            .await?;
-        Ok(bot.map(Bot::from))
-    }
-}
-
-impl From<entities::third_party_api_key::Model> for ThirdPartyAPIKey {
-    fn from(model: entities::third_party_api_key::Model) -> Self {
-        Self {
-            id: model.id,
-            r#type: model.r#type.to_string(),
-            token: model.token,
-            created_at: model.created_at,
-            revoked_at: model.revoked_at,
-            user_id: model.user_id,
         }
     }
 }

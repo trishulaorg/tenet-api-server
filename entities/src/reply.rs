@@ -18,7 +18,11 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(belongs_to = "super::thread::Entity", from = "Column::ThreadId", to = "super::thread::Column::Id")]
+    #[sea_orm(
+        belongs_to = "super::thread::Entity",
+        from = "Column::ThreadId",
+        to = "super::thread::Column::Id"
+    )]
     Thread,
 }
 
