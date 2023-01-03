@@ -19,3 +19,22 @@ chrono = "0.4.23"
 serde = "1.0.150"
 openssl-sys = "0.9.79"
 futures = "0.3.25"
+syn = "1.0.106"
+quote = "1.0.22"
+
+graphql = { path = "./graphql" }
+async-std = { version = "^1", features = ["attributes", "tokio1"] }
+
+entities = { path = "./entities" }
+migration = { path = "./migration" }
+ulid = "1.0.0"
+
+
+[workspace]
+
+members = [
+  "entities",
+  "graphql",
+  "repository",
+  "migration",
+]

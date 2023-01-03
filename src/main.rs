@@ -1,59 +1,18 @@
-mod setup;
+use ::graphql::{queries::*, Token};
 
-use futures::executor::block_on;
+use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema};
+use async_graphql_poem::{GraphQLRequest, GraphQLResponse};
+use poem::{
+    get, handler,
+    http::HeaderMap,
+    listener::TcpListener,
+    web::{Data, Html},
+    IntoResponse, Route, Server,
+};
 
-use sea_orm::{Database, DbErr, DatabaseConnection, ConnectionTrait};
 
 use std::env;
-
-use setup::set_up_db;
-
-use crate::entities::{prelude::*, *};
-
-
-use tracing_subscriber;
-use async_graphql::{
-    http::GraphiQLSource, Context, EmptyMutation, EmptySubscription, Object, Schema, parser::Error, ComplexObject,
-};
-use async_graphql_poem::GraphQL;
-use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
-
-mod entities;
-use sea_orm::*;
-use entities::*;
-
-pub struct QueryRoot;
-
-#[Object]
-impl QueryRoot {
-    async fn howdy<'a>(
-        &self,
-        ctx: &Context<'a>,
-        #[graphql(desc = "id of the human")] _id: String,
-    ) -> String {
-        "aaa".to_owned()
-    
-    }
-
-    async fn user(&self, ctx: &Context<'_>, id: i32) -> Result<Option<user::Model>, DbErr> {
-        let db = ctx.data::<DatabaseConnection>().unwrap();
-        User::find_by_id(id).one(db).await
-    }
-    async fn users(&self, ctx: &Context<'_>, id: i32) -> Result<Vec<user::Model>, DbErr> {
-        let db = ctx.data::<DatabaseConnection>().unwrap();
-        User::find().all(db).await
-    }
-    async fn persona(&self, ctx: &Context<'_>, id: i32) -> Result<Option<persona::Model>, DbErr> {
-        let db = ctx.data::<DatabaseConnection>().unwrap();
-        Persona::find_by_id(id).one(db).await
-    }
-    async fn personas(&self, ctx: &Context<'_>, id: i32) -> Result<Vec<persona::Model>, DbErr> {
-        let db = ctx.data::<DatabaseConnection>().unwrap();
-        Persona::find().all(db).await
-    }
-}
-
-
+use tenet_api_server::db_connection;
 
 #[handler]
 async fn graphql() -> impl IntoResponse {
@@ -64,24 +23,42 @@ async fn graphql() -> impl IntoResponse {
     )
 }
 
+fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {
+    headers
+        .get("Authorization")
+        .and_then(|value| value.to_str().map(|s| Token(s.to_string())).ok())
+}
+
+#[handler]
+async fn index(
+    schema: Data<&Schema<QueryRoot, EmptyMutation, EmptySubscription>>,
+    headers: &HeaderMap,
+    req: GraphQLRequest,
+) -> GraphQLResponse {
+    let mut req = req.0;
+    if let Some(token) = get_token_from_headers(headers) {
+        req = req.data(token);
+    }
+    schema.execute(req).await.into()
+}
 
 #[tokio::main]
 async fn main() {
+    dotenv::dotenv().ok();
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::DEBUG)
         .with_test_writer()
         .init();
 
-    // init db
-    let db = match set_up_db().await {
-        Ok(db) => db,
-        Err(err) => panic!("{}", err),
-    };
+    let database_url: std::string::String = env::var("DATABASE_URL").unwrap();
+    let database_name: std::string::String = env::var("DATABASE_NAME").unwrap();
     // create the schema
-    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription).data(db).finish();
+    let _schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
+        .data(db_connection(&database_url, &database_name).await)
+        .finish();
 
     // start the http server
-    let app = Route::new().at("/", get(graphql).post(GraphQL::new(schema)));
+    let app = Route::new().at("/", get(graphql).post(index));
     println!("GraphiQL IDE: http://localhost:8000");
     Server::new(TcpListener::bind("127.0.0.1:8000"))
         .run(app)
