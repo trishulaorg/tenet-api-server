@@ -87,6 +87,27 @@ impl From<entities::bot::Model> for Bot {
         }
     }
 }
+// Model: Board 
+#[derive(Clone, Debug, SimpleObject)]
+pub struct Board {
+    pub id: String,
+    pub created_at: NaiveDateTime,
+    pub title: String,
+    pub content: String,
+    pub raw_content: String,
+}
+
+impl From<entities::board::Model> for Board {
+    fn from(model: entities::board::Model) -> Self {
+        Self {
+            id: model.id,
+            created_at: model.created_at,
+            title: model.title,
+            content: model.content,
+            raw_content: model.raw_content
+        }
+    }
+}
 // Model: Post
 #[derive(Clone, Debug, SimpleObject)]
 #[graphql(complex)]

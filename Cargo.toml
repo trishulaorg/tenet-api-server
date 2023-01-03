@@ -27,6 +27,7 @@ async-std = { version = "^1", features = ["attributes", "tokio1"] }
 
 entities = { path = "./entities" }
 migration = { path = "./migration" }
+ulid = "1.0.0"
 
 
 [workspace]
